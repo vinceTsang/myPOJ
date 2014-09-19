@@ -1,0 +1,36 @@
+/**
+ * dp[i][j] = sigma( dp[i-1][ j-c[k]*w[i] ] ) k from 1 to hooks_num
+ * 状态表示放第i个物品后到达平衡度j的方法数为放前一个物品时，放在不同挂钩从不同平衡度到达j的方法数的和
+ * 同理，一个状态会因为新放一个物品到不同挂钩而加和到不同状态
+ * 在具体实现时，将一个非空状态加和至相应的各个状态。
+ */
+#include <iostream>
+#include <stdio.h>
+#include <cstring>
+using namespace std;
+int dp[21][15001];
+int main()
+{
+    int C,G,i,j,k;
+    int c[21],w[21];
+    scanf("%d%d",&C,&G);
+    for(i=1;i<=C;i++){
+        scanf("%d",&c[i]);
+    }
+    for(i=1;i<=G;i++){
+        scanf("%d",&w[i]);
+    }
+    memset(dp,0,sizeof(dp));
+    dp[0][7500]=1;
+    for(i=1;i<=G;i++){
+        for(j=0;j<15000;j++){
+            if(dp[i-1][j]){
+                for(k=1;k<=C;k++){
+                    dp[i][ j+w[i]*c[k] ] += dp[i-1][j];
+                }
+            }
+        }
+    }
+    printf("%d\n",dp[G][7500]);
+    return 0;
+}
