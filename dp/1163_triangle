@@ -1,0 +1,26 @@
+#include <iostream>
+#include <stdio.h>
+using namespace std;
+//dfs TLE
+//1D dp array
+//from bottom to top
+//168K	0MS
+int main()
+{
+    short dp[101];
+    int i,j,N,t[101][101];
+    scanf("%d",&N);
+    for(i=0;i<N;i++){
+        for(j=0;j<i+1;j++)
+            scanf("%d",&t[i][j]);
+    }
+    for(j=0;j<N;j++) dp[j]=t[N-1][j];
+    for(i=N-2;i>=0;i--){
+        for(j=0;j<i+1;j++){
+            dp[j]=dp[j]>dp[j+1]?dp[j]:dp[j+1];
+            dp[j]+=t[i][j];
+        }
+    }
+    printf("%d\n",dp[0]);
+    return 0;
+}
