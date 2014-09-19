@@ -1,0 +1,32 @@
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+using namespace std;
+
+int main()
+{
+    char s1[5005],s2[5005];
+    short dp[5005];
+    int N;
+    scanf("%d",&N);
+    scanf("%s",s1);
+    for(int i=0;i<N;i++) s2[i]=s1[N-i-1];
+    s2[N]='\0';
+    int old,temp;
+    memset(dp,0,sizeof(dp));
+    //old 代表dp[i-1][j-1]
+    //dp[j]代表dp[i-1][j]
+    for(int i=0;i<N;i++){
+        old=0;
+        for(int j=0;j<N;j++){
+            temp=dp[j]; //记录dp[i-1][j],为下一列的old
+            if(s1[i]==s2[j])
+                dp[j]=old+1;
+            else
+                dp[j]=temp>dp[j-1]?temp:dp[j-1]; //取dp[i-1][j]和dp[i][j-1]中的较大值
+            old=temp; //上一列的dp[i-1][j]为下一列的dp[i-1][j-1]
+        }
+    }
+    printf("%d\n",N-dp[N-1]);
+    return 0;
+}
