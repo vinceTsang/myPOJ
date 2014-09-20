@@ -1,0 +1,64 @@
+#include <iostream>
+#include <stdio.h>
+#include <cstring>
+using namespace std;
+int h[100][100];
+int sum[100][100];
+int R,C;
+int dfs(int i,int j,int len){
+    int Max = ++len;
+    int tmp;
+    int cur_h=h[i][j];
+    if(j+1<C && cur_h>h[i][j+1]){
+        if(sum[i][j+1]!=0)
+            tmp=sum[i][j+1]+len;
+        else
+            tmp=dfs(i,j+1,len);
+        Max=tmp>Max?tmp:Max;
+    }
+    if(i+1<R && cur_h>h[i+1][j]){
+        if(sum[i+1][j]!=0)
+            tmp=sum[i+1][j]+len;
+        else
+            tmp=dfs(i+1,j,len);
+        Max=tmp>Max?tmp:Max;
+    }
+    if(i-1>=0 && cur_h>h[i-1][j]){
+        if(sum[i-1][j]!=0)
+            tmp=sum[i-1][j]+len;
+        else
+            tmp=dfs(i-1,j,len);
+        Max=tmp>Max?tmp:Max;
+    }
+    if(j-1>=0 && cur_h>h[i][j-1]){
+        if(sum[i][j-1]!=0)
+            tmp=sum[i][j-1]+len;
+        else
+            tmp=dfs(i,j-1,len);
+        Max=tmp>Max?tmp:Max;
+    }
+    return Max;
+}
+int main()
+{
+    int i,j;
+    scanf("%d%d",&R,&C);
+    for(i=0;i<R;i++){
+        for(j=0;j<C;j++){
+            scanf("%d",&h[i][j]);
+        }
+    }
+    memset(sum,0,sizeof(sum));
+    int Max=-1,tmp;
+    for(i=0;i<R;i++){
+        for(j=0;j<C;j++){
+            if(h[i][j]>Max){
+                tmp=dfs(i,j,0);
+                sum[i][j]=tmp;
+                Max = tmp > Max ? tmp : Max;
+            }
+        }
+    }
+    printf("%d\n",Max);
+    return 0;
+}
