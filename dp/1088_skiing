@@ -5,42 +5,34 @@ using namespace std;
 int h[100][100];
 int sum[100][100];
 int R,C;
-int dfs(int i,int j,int len){
-    int Max = ++len;
+int dfs(int i,int j){
+    if(sum[i][j]!=0)
+        return sum[i][j];
+    int Max = 1;
     int tmp;
     int cur_h=h[i][j];
     if(j+1<C && cur_h>h[i][j+1]){
-        if(sum[i][j+1]!=0)
-            tmp=sum[i][j+1]+len;
-        else
-            tmp=dfs(i,j+1,len);
+        tmp=1+dfs(i,j+1);
         Max=tmp>Max?tmp:Max;
     }
     if(i+1<R && cur_h>h[i+1][j]){
-        if(sum[i+1][j]!=0)
-            tmp=sum[i+1][j]+len;
-        else
-            tmp=dfs(i+1,j,len);
+        tmp=1+dfs(i+1,j);
         Max=tmp>Max?tmp:Max;
     }
     if(i-1>=0 && cur_h>h[i-1][j]){
-        if(sum[i-1][j]!=0)
-            tmp=sum[i-1][j]+len;
-        else
-            tmp=dfs(i-1,j,len);
+        tmp=1+dfs(i-1,j);
         Max=tmp>Max?tmp:Max;
     }
     if(j-1>=0 && cur_h>h[i][j-1]){
-        if(sum[i][j-1]!=0)
-            tmp=sum[i][j-1]+len;
-        else
-            tmp=dfs(i,j-1,len);
+        tmp=1+dfs(i,j-1);
         Max=tmp>Max?tmp:Max;
     }
+    sum[i][j]=Max; //record every time the dfs was called
     return Max;
 }
 int main()
 {
+    //freopen("1088.in","r",stdin);
     int i,j;
     scanf("%d%d",&R,&C);
     for(i=0;i<R;i++){
@@ -53,8 +45,8 @@ int main()
     for(i=0;i<R;i++){
         for(j=0;j<C;j++){
             if(h[i][j]>Max){
-                tmp=dfs(i,j,0);
-                sum[i][j]=tmp;
+                tmp=dfs(i,j);
+                //sum[i][j]=tmp;
                 Max = tmp > Max ? tmp : Max;
             }
         }
