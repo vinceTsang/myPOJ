@@ -1,0 +1,94 @@
+/**
+ * 压缩dp
+ * 地图的状态和可行决策(state)都进行压缩
+ * 其中地图中H表示1，对每行决策中"放炮兵"表示1，二进制压为十进制
+ * dp[i][j][k]表示第i行状态为state[i],i-1行状态为state[k]的最大炮兵数
+ * dp[i][j][k] = max{ dp[i-1][k][l] + stanum[j]  }
+ * 此处l即为i-2行，枚举l，且j,k,l的state值以及地形(硬性条件)互不冲突
+ */
+#include <iostream>
+#include <stdio.h>
+#include <cstring>
+using namespace std;
+#define max(a,b) (a) > (b) ? (a) : (b)
+char map[101][11]; //地图
+int surface[101]; //地图状态压缩
+int state[61]; //所有合法的决策压缩,由于最多只有10列，合法状态最多只有60个
+int stanum[61]; //相应决策的炮兵数量
+int dp[101][61][61];
+int main(){
+//    freopen("1185.in","r",stdin);
+    memset(map,0,sizeof(map));
+    memset(surface,0,sizeof(surface));
+    memset(state,0,sizeof(state));
+    memset(stanum,0,sizeof(stanum));
+    memset(dp,0,sizeof(dp));
+    int row, col, i, j, k, l;
+    scanf("%d%d", &row, &col);
+    for(i = 0; i < row; i++){
+        scanf("%s",&map[i]);
+    }
+    for(i = 0; i < row; i++){
+        for(j = 0; j < col; j++){
+            if(map[i][j] == 'H')
+                surface[i] += 1<<j; //低位在前
+        }
+    }
+    int legal_snum = 0;
+    for(i = 0; i < (1 << col); i++){
+        //求出所有可行的自兼容的行决策，即该行任两个炮兵不冲突
+        //i本身即为压缩的十进制
+        //stanum中存放决策中1的个数，即炮兵个数
+        int tmp = i, count = 0;
+        if( (i<<1) & i || (i<<2) & i ) continue; //该状态不可行，不加入到state中
+        while( tmp ){
+            count++;
+            tmp &= (tmp-1); //每次操作能直接消去最右边的1，count记录1的个数
+        }
+        stanum[legal_snum] = count;
+        state[legal_snum++] = i;
+    }
+    //初始化第0行
+    for(i = 0; i < legal_snum; i++){
+        if(state[i] & surface[0]) continue; //地形冲突，此处为状态压缩的巧妙之一。
+                                            //一次位运算即可判断行决策与地形之间和决策与决策之间是否冲突
+        dp[0][i][0] = stanum[i];
+    }
+    //初始化第1行
+    for(i = 0; i < legal_snum; i++){
+        if(state[i] & surface[1]) continue;
+        for(k = 0; k < legal_snum; k++){ //枚举前一行，即第0行
+            if(state[k] & surface[0]) continue;
+            if(state[i] & state[k]) continue;
+            dp[1][i][k] = max( dp[1][i][k], dp[0][k][0] + stanum[i] );
+        }
+    }
+    //dp
+    for(i = 2; i < row; i++){
+        for(j = 0; j < legal_snum; j++){
+            if(surface[i] & state[j]) continue; //第i行决策j
+            for(k = 0; k < legal_snum; k++){
+                if(surface[i-1] & state[k]) continue; //第i-1行决策k
+                if(state[j] & state[k]) continue;
+                for(l = 0; l < legal_snum; l++){
+                    if(surface[i-2] & state[l]) continue; //第i-2行决策l
+                    if(state[j] & state[l] || state[k] & state[l]) continue;
+                    dp[i][j][k] = max( dp[i][j][k], dp[i-1][k][l] + stanum[j] );
+                }
+            }
+        }
+    }
+    //output
+    if(row == 0)
+        printf("%d\n",0);
+    else{
+        int max = 0;
+        for(i = 0; i < legal_snum; i++){
+            for(j = 0; j < legal_snum; j++){
+                if(max < dp[row-1][i][j]) max = dp[row-1][i][j];
+            }
+        }
+        printf("%d\n",max);
+    }
+    return 0;
+}
