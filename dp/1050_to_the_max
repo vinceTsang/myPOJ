@@ -1,0 +1,33 @@
+/**
+ * 将多列压缩成一列，分别求一维最大连续子段和
+ */
+#include <iostream>
+#include <stdio.h>
+using namespace std;
+int main(){
+    int n;
+    int a[101][101]={0};
+    int colsum[101][101]={0};
+    int max = 0, sum, i, j, k;
+    scanf("%d",&n);
+    for(i = 0; i < n; i++)
+        for(j = 1; j <= n; j++){
+            scanf("%d",&a[i][j-1]);
+            colsum[i][j] = colsum[i][j-1] + a[i][j-1]; //colsum表示第i行前j个元素的和
+        }
+    for(i = 0; i < n; i++){
+        for(j = i + 1; j <= n; j++){
+            sum = 0;
+            for(k = 0; k < n; k++){
+                //此时第k行的第i列至第j列的和压缩为一个数，将i至j列的所有行这样一个子矩形压缩至一维
+                //则k从第0行按列扫描至第n-1行即求得一维最大连续子段和
+                sum += colsum[k][j] - colsum[k][i];
+                if(sum < 0) sum = 0;
+                else if(sum > max) max = sum;
+
+            }
+        }
+    }
+    printf("%d\n",max);
+    return 0;
+}
