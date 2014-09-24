@@ -1,0 +1,34 @@
+//136K	0MS
+#include <iostream>
+#include <stdio.h>
+using namespace std;
+int stack[1001], top=0; //桟增序
+int binary_search(int value, int len){
+    int st=1, ed=len, mid;
+    while(st<=ed){
+        mid=(st+ed)/2; 
+        if(stack[mid] == value) return mid;
+        else if(stack[mid] > value){
+            ed=mid-1;
+        }else{
+            st=mid+1;
+        }
+    }
+    return st; //若不等，则返回值恰等于桟中所有大于的value的，最小的位置
+}
+int main(){
+    int N, i, k, tmp;
+    scanf("%d",&N);
+    stack[0]=-1;
+    for(i=0; i<N; i++){
+        scanf("%d",&tmp);
+        if(tmp>stack[top]){
+            stack[++top]=tmp;
+        }else if(tmp<stack[top]){ //用a[i]替换桟中某个元素，使得桟各元素组成的序列更具增长潜力
+            k = binary_search(tmp,top);
+            stack[k]=tmp;
+        }
+    }
+    printf("%d\n",top);
+    return 0;
+}
