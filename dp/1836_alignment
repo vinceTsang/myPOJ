@@ -1,0 +1,44 @@
+#include <iostream>
+#include <stdio.h>
+using namespace std;
+const int M = 1005;
+double a[M];
+int dp[M], Dp[M];
+/**
+ * 双向LIS(longest increase string)
+ * dp[i]表示从0至i的最长的递增序列长度
+ * Dp[i]表示从n-1至i的最长的反向递增序列长度
+ *
+ * dp[i]=max{ dp[i], dp[j] + 1 },其中j<i且a[j]<a[i],遍历j
+ * Dp[i]=max{ Dp[i], dp[j] + 1 },其中j>i且a[j]>a[i],遍历j
+ */
+int main(){
+    int n, i, j;
+    scanf("%d",&n);
+    for(i=0; i<n; i++){
+        scanf("%lf",a+i);
+        dp[i]=Dp[i]=1; //初始均为1，表示自己为首
+    }
+    for(i=1; i<n; i++){
+        for(j=0; j<i; j++){
+            if(a[j]<a[i]){
+                dp[i]=max(dp[i],dp[j]+1);
+            }
+        }
+    }
+    for(i=n-2; i>=0; i--){
+        for(j=n-1; j>i; j--){
+            if(a[j]<a[i]){
+                Dp[i]=max(Dp[i],Dp[j]+1);
+            }
+        }
+    }
+    int ans = 0;
+    for(i=0; i<n; i++){ //相当与枚举递增与反向递增序列的相聚点
+        for(j=i+1; j<n; j++){
+            ans=max(ans,dp[i]+Dp[j]);
+        }
+    }
+    printf("%d\n",n-ans);
+    return 0;
+}
