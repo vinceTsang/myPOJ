@@ -1,0 +1,44 @@
+#include <iostream>
+#include <stdio.h>
+#include <cstring>
+using namespace std;
+#define max(a,b) (a) > (b) ? (a) : (b)
+int dp[100000];
+int cash, N;
+void one_zero_pack(int cost, int value){
+    for(int v=cash; v>=cost; v--){
+        dp[v]=max(dp[v], dp[v-cost]+value);
+    }
+}
+void complete_pack(int cost, int value){
+    for(int v=cost; v<=cash; v++){
+        dp[v]=max(dp[v], dp[v-cost]+value);
+    }
+}
+void multi_pack(int cost, int value, int amount){
+    if(cost*amount > cash){
+        complete_pack(cost,value);
+        return;
+    }
+    int k = 1;
+    while(amount > k){
+        one_zero_pack(k*cost, k*value);
+        amount-=k;
+        k <<= 1;
+    }
+    one_zero_pack(amount*cost, amount*value);
+}
+int main(){
+    int i,num[1001],d[1001];
+    while( scanf("%d%d",&cash,&N)!=EOF ){
+        for(i=0; i<N; i++){
+            scanf("%d%d",num+i,d+i);
+        }
+        memset(dp,0,sizeof(dp));
+        for(i=0; i<N; i++){
+            multi_pack(d[i],d[i],num[i]);
+        }
+        printf("%d\n",dp[cash]);
+    }
+    return 0;
+}
