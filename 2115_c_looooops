@@ -1,0 +1,49 @@
+/**
+ * 线性同余问题
+ * 用拓展欧几里德算法求解
+ * a*x + b*y = c
+ * 此处 C*x + (2^k)*y = B-A
+ */
+#include <iostream>
+#include <stdio.h>
+using namespace std;
+typedef long long ll;
+ll exgcd(ll a, ll b, ll &x, ll &y){
+    if(b == 0){
+        x=1; y=0;
+        return a;
+    }
+    ll d = exgcd(b, a%b, x, y);
+    ll t = x - a/b*y;
+    x=y; y=t;
+    return d;
+}
+ll Pow[33];
+void init_pow(){
+    Pow[1]=2;
+    for(int i=2; i<33; i++)
+        Pow[i] = Pow[i-1]*2LL;
+}
+int main(){
+    ll A, B, C;
+    init_pow();
+    int k;
+    while(1){
+        cin>>A>>B>>C>>k;
+        if(A==0 && B==0 && C==0 && k==0) break;
+        ll MOD = Pow[k];
+        //ll target = (B-A+MOD)%MOD;
+        //其实可以不必取模,因为在之后对r的两次取模中考虑了target为大负数的情况
+        ll target = B - A;
+        ll x,y,r;
+        ll d = exgcd(C, MOD, x, y);
+        if(! (target%d) ){
+            r = MOD/d;
+            x = ((target)/d*x%r + r)%r;
+            cout << x << endl;
+        }else{
+            printf("FOREVER\n");
+        }
+    }
+    return 0;
+}
