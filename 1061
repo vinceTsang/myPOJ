@@ -8,7 +8,7 @@
  * 定理一:
  * 若d = gcd(a,b),则比能找到正或负的整数x和y,使得d = a*x + b*y
  *
- * extend-gcd:(扩展欧基里得的算法)
+ * extend-gcd:(扩展欧基里得算法)
  * a*x0 + b*y0 = gcd(a,b)           --------(一)
  * 因gcd(a,b)==gcd(b,a%b),而gcd(b,a%b) = b*x1 + (a%b)*y1,且a%b = a-a/b*b
  * 则a*x0 + b*y0 = b*x1 + (a-a/b*b)*y1 = a*y1 + b*(x1-a/b*y1)
