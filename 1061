@@ -1,0 +1,66 @@
+/************************************************************************************
+ * 数论线性同余方程问题
+ * 通用问题类型:
+ * 已知整数a,b,c,求a*x + b*y = c的整数解x,y
+ * 实际是 a*x mod b ≡  c 的线性同余方程
+ * 有解当且仅当c能被gcd(a,b)整除
+ *
+ * 定理一:
+ * 若d = gcd(a,b),则比能找到正或负的整数x和y,使得d = a*x + b*y
+ *
+ * extend-gcd:(扩展欧基里得的算法)
+ * a*x0 + b*y0 = gcd(a,b)           --------(一)
+ * 因gcd(a,b)==gcd(b,a%b),而gcd(b,a%b) = b*x1 + (a%b)*y1,且a%b = a-a/b*b
+ * 则a*x0 + b*y0 = b*x1 + (a-a/b*b)*y1 = a*y1 + b*(x1-a/b*y1)
+ * 即x0 = y1, y0 = x1-a/b*y1
+ * 递归至gcd(a',0) = a'*xn + 0*yn, 此时令xn = 1, yn = 0 返回,至此求得(一)式的解x0,y0
+ * 即a*x0 + b*y0 = d. 两边同乘c/d即求得原问题的解为x=c/d*x0
+ *
+ * 定理二:
+ * 若gcd(a,b) = 1,则方程ax ≡ c(mod b)在[0, b-1]上有唯一解
+ *
+ * 定理三:
+ * 若gcd(a,b) = d,则方程ax ≡ c(mod b)在[0, b/d - 1]上有唯一解
+ *
+ * 方程ax ≡ c(mod b)等价于 a*x + b*y = c, 若有解,则同除d后 a/d * x + b/d * y = c/d
+ * 即a/d * x ≡ c/d (mod b/d),其中c/d也必为整数
+ * 又gcd(a/d, b/d) = 1显然成立,则由定理二知x在[0, b/d - 1]上有唯一解
+ * 故a*x + b*y = c的x在[0, b/d - 1]上有唯一解,定理三得证
+ *
+ * 对问题若求出一个特解X,则通解为X + k*(b/d),其中k为整数,d为gcd(a,b)
+ * 而运用定理三显然能求得最小的解(位于[0,r-1])
+ * 记r=b/d,由特解X可得最小解x = (X%r + r) % r
+ * (注意X可能为负且绝对值大于r,故要取两次模)
+ ************************************************************************************/
+
+/**
+ * 对本题而言,问题描述为(x+m*t) - (y+n*t) = k*L
+ * 变形为(m-n)*t - k*L = (y-x)
+ * 对应通用问题,a,b,c分别为 (m-n),L,(y-x)
+ */
+#include <iostream>
+using namespace std;
+#define ll long long
+ll exgcd(ll a, ll b, ll &x, ll &y){
+    ll d,t;
+    if(b == 0){
+        x = 1;
+        y = 0;
+        return a;
+    }
+    d = exgcd(b, a%b, x, y);
+    t = x -a/b * y;
+    x = y; y = t; //x0 = y1, y0 = x1 - a/b*y1
+    return d;
+}
+int main(){
+    ll x, y, m, n, L, X, Y, d, r;
+    while(cin>>x>>y>>m>>n>>L){
+        d = exgcd(n-m, L, X, Y);
+        r = L / d;
+        if((x-y)%d) cout<<"Impossible" << endl;
+        else
+            cout<< ((x-y)/d*X %r + r)%r << endl;
+    }
+    return 0;
+}
