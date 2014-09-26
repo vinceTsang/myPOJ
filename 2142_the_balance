@@ -1,0 +1,56 @@
+/**
+ * 线性同余方程问题
+ * a*x + b*y = c
+ * 通解x = X + k*(b/d)
+ * 本题a*x + b*y = c
+ * x,y逻辑上可能为负
+ * 要求|x|+|y|取最小值
+ * |x|+|y|=|x0+b/d *t |+|y0-a/d *t| 这个关于t的函数的最小值在t零点附近
+ */
+#include <iostream>
+#include <stdio.h>
+#include <limits.h>
+using namespace std;
+int exgcd(int a, int b, int &x, int &y){
+    if(b==0){
+        x=1; y=0;
+        return a;
+    }
+    int d=exgcd(b, a%b, x, y);
+    int t=x;
+    x=y;
+    y=t-a/b*y;
+    return d;
+}
+int get_abs(int k){
+    if(k<0)return -k;
+    return k;
+}
+int main(){
+    int a,b,c,x,y,d,r,i;
+    while(1){
+        scanf("%d%d%d",&a,&b,&c);
+        if((a+b+c) == 0) break;
+        int flag=0;
+        if(a<b){ //求解时使a>b,此时|y|图像斜率更大,t零点直接对y取
+            int temp=a;a=b;b=temp;flag=1;
+        }
+        d=exgcd(a, b, x, y);
+        int x0=x*(c/d);
+        int y0=y*(c/d);
+        int h=y0/(a/d);
+        int min=INT_MAX;
+        int minx, miny;
+        for(i=h-2;i<h+3;i++){
+            x = x0 + b/d*i;
+            y = y0 - a/d*i;
+            if(get_abs(x)+get_abs(y)<min){
+                min=get_abs(x)+get_abs(y);
+                minx=x; miny=y;
+            }
+        }
+        if(!flag) printf("%d %d\n",get_abs(minx),get_abs(miny));
+        else printf("%d %d\n",get_abs(miny),get_abs(minx));
+    }
+    return 0;
+}
