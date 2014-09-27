@@ -1,0 +1,45 @@
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+using namespace std;
+char sum[106];
+void add_big_int(char *s, int len){
+    int temp,k=0,i;
+    for(i=0; i<len; i++){
+        temp=s[i]-'0' + sum[i]-'0' + k;
+        k=temp/10;
+        temp %= 10;
+        sum[i]=temp+'0';
+    }
+    while(k){
+        temp=sum[i]-'0'+k;
+        k=temp/10;
+        temp %= 10;
+        sum[i]=temp+'0';
+        i++;
+    }
+}
+int main(){
+    char a[101], aa[101];
+    int i, len;
+    //init sum
+    for(i=0;i<106;i++) sum[i]='0';
+    while(1){
+        gets(a);
+        if(a[0]=='0' && a[1]=='\0') break;
+        len=strlen(a);
+        for(i=0; i<len; i++ ){
+            aa[i]=a[len-1-i];
+        }
+        add_big_int(aa,len);
+    }
+    len=strlen(sum);
+    bool head=1;
+    for(i=len-1;i>=0;i--){
+        if(head && sum[i]=='0') continue;
+        else head = 0;
+        printf("%c",sum[i]);
+    }
+    printf("\n");
+    return 0;
+}
