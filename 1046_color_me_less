@@ -1,0 +1,35 @@
+#include <iostream>
+#include <stdio.h>
+using namespace std;
+typedef struct{
+    int R;
+    int G;
+    int B;
+}Color;
+int exp2(int x){
+    return x*x;
+}
+int main()
+{
+    //freopen("d:\\inputDate.txt","r",stdin);
+    Color maps[16];
+    int i,DD,minD,minIndex;
+    int r,g,b;
+    for(i=0;i<16;i++){
+        scanf("%d%d%d",&maps[i].R, &maps[i].G, &maps[i].B);
+    }
+    while(scanf("%d%d%d",&r,&g,&b) && (r!=-1 && g!=-1 && b!=-1) ){
+        minD=5000000;
+        minIndex=0;
+        for(i=0;i<16;i++){
+            DD=exp2(r-maps[i].R) + exp2(g-maps[i].G) + exp2(b-maps[i].B);
+            if(DD<minD){
+                minD=DD;
+                minIndex=i;
+            }
+        }
+        printf("(%d,%d,%d) maps to (%d,%d,%d)\n",
+               r,g,b,maps[minIndex].R,maps[minIndex].G,maps[minIndex].B);
+    }
+    return 0;
+}
