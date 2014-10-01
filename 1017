@@ -1,0 +1,77 @@
+#include <iostream>
+#include <stdio.h>
+using namespace std;
+int p[7];
+void count_both_p1_p2(int need1,int need2){
+    if(p[2]>=need2){ //对2*2的需求
+        p[2]-=need2;
+    }else{
+        need2-=p[2];
+        p[2]=0;
+        need1+=(need2<<2); //为对1的需求
+    }
+    if(p[1]>need1){
+        p[1]-=need1;
+    }else{
+        p[1]=0;
+    }
+}
+int main()
+{
+    //freopen("d:\\inputDate.txt","r",stdin);
+    int sum,tmp,need1,need2,i;
+    while(1){
+        for(i=1;i<7;i++){
+            scanf("%d",p+i);
+        }
+        if(p[1]==0 && p[2]==0 && p[3]==0 && p[4]==0 && p[5]==0 && p[6]==0) break;
+        sum=p[6];
+        tmp=p[5];
+        sum+=tmp;
+        need1=tmp*11;
+        if(p[1]>need1)
+            p[1]-=need1;
+        else
+            p[1]=0;
+        tmp=p[4];
+        sum+=tmp;
+        need2=tmp*5;
+        count_both_p1_p2(0,need2);
+        tmp=p[3];
+        sum += tmp/4;
+        tmp%=4;
+        if(tmp){
+            sum++;
+            if(tmp==1){
+                need2=5;
+                need1=7;
+                count_both_p1_p2(need1,need2);
+            }else if(tmp==2){
+                need2=3;
+                need1=6;
+                count_both_p1_p2(need1,need2);
+            }else if(tmp==3){
+                need2=1;
+                need1=5;
+                count_both_p1_p2(need1,need2);
+            }
+        }
+        tmp=p[2];
+        sum += tmp/9;
+        tmp%=9;
+        if(tmp!=0){
+            sum++;
+            need1=36-4*tmp;
+            if(p[1]>need1){
+                p[1]-=need1;
+            }else{
+                p[1]=0;
+            }
+        }
+        tmp=p[1];
+        sum += tmp/36;
+        if(tmp%36) sum++;
+        printf("%d\n",sum);
+    }
+    return 0;
+}
