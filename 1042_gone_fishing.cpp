@@ -1,3 +1,6 @@
+/**
+ * 枚举最优解后分别贪心
+ * /
 #include <iostream>
 #include <stdio.h>
 using namespace std;
