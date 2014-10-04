@@ -1,0 +1,100 @@
+/**
+ * 由于sigma(xi^2)最小时,均方差最小,故dp阶段只考虑平方和
+ * 用s(x1,y1,x2,y2)表示左上角和右下角分别为(x1,y1),(x2,y2)的矩形棋盘的平方和
+ * 用dp(k,x1,y1,x2,y2)表该矩形切割k次后获得的最小平方和
+ * 由于矩形可以横切和竖切,且切后可以选其中一块继续进行切割
+ * 则dp(k,x1,y1,x2,y2)=min{
+ *     min{ dp(k-1,x1,y1,a,y2) + s(a+1,y1,x2,y2) , s(x1,y1,a,y2) + dp(k-1,a+1,y1,x2,y2)  }, //竖切
+ *     min{ dp(k-1,x1,y1,x2,b) + s(x1,b+1,x2,y2) , s(x1,y1,x2,b) + dp(k-1,x1,b+1,x2,y2)  }  //横切
+ * }
+ * 其中a属于(x1,x2),b属于(y1,y2),遍历a,b
+ * 预处理只需算出左上角为(1,1)的矩阵平方和
+ * 过程中任意矩阵(x1,y1,x2,y2)的值为
+ * s(1,1,x2,y2)-s(1,1,x2,y1-1)-s(1,1,x1-1,y2)+s(1,1,x1-1,y1-1)
+ */
+#include <iostream>
+#include <stdio.h>
+#include <cstring>
+#include <limits.h>
+#include <math.h>
+using namespace std;
+#define min(a,b) (a) < (b) ? (a) : (b)
+int dp[15][8][8][8][8];
+int s[8][8];
+int curS(int x1, int y1, int x2, int y2){
+    int sum=0;
+    if(x1==0 && y1==0)
+        sum=s[x2][y2];
+    else if(y1==0)
+        sum=s[x2][y2] - s[x1-1][y2];
+    else if(x1==0)
+        sum=s[x2][y2] - s[x2][y1-1];
+    else
+        sum=s[x2][y2] - s[x2][y1-1] - s[x1-1][y2] + s[x1-1][y1-1];
+    return sum*sum;
+}
+int main(){
+    memset(dp,0,sizeof(dp));
+    int n, i, j, k, t,tmp;
+    float sum=0;
+    int chessboard[8][8];
+    scanf("%d",&n);
+    for(i=0;i<8;i++){//i对应x坐标
+        for(j=0;j<8;j++){
+            scanf("%d",&chessboard[i][j]);
+            sum+=chessboard[i][j];
+            tmp=0;
+            for(k=0;k<=i;k++){
+                for(t=0;t<=j;t++){
+                    tmp+= chessboard[k][t];
+                }
+            }
+            s[i][j]=tmp;
+        }
+    }
+    /*
+    for(i=0;i<8;i++){
+        for(j=0;j<8;j++){
+            //dp[0][i][j][i][j]=chessboard[i][j]*chessboard[i][j]; 初始化错误,一次也不必切割的除了单一格子以外,也应考虑普通矩形
+        }
+    }*/
+    int x1,x2,y1,y2,a,b,MIN,curS1,curS2;
+    for(k=0;k<n;k++){
+        for(x1=0;x1<8;x1++){
+            for(y1=0;y1<8;y1++){
+                for(x2=x1;x2<8;x2++){
+                    for(y2=y1;y2<8;y2++){
+                        if(!k){
+                            //init
+                            dp[0][x1][y1][x2][y2]=curS(x1,y1,x2,y2);
+                            continue;
+                        }
+                        //竖切 min{ dp(k-1,x1,y1,a,y2) + s(a+1,y1,x2,y2) , s(x1,y1,a,y2) + dp(k-1,a+1,y1,x2,y2)  }
+                        MIN=INT_MAX/10;
+                        for(a=x1;a<x2;a++){
+                            curS1=curS(a+1,y1,x2,y2);
+                            curS2=curS(x1,y1,a,y2);
+                            tmp=min( dp[k-1][x1][y1][a][y2]+curS1 , curS2+dp[k-1][a+1][y1][x2][y2] );
+                            MIN=min(tmp,MIN);
+                        }
+                        //横切 min{ dp(k-1,x1,y1,x2,b) + s(x1,b+1,x2,y2) , s(x1,y1,x2,b) + dp(k-1,x1,b+1,x2,y2)  } 
+                        for(b=y1;b<y2;b++){
+                            curS1=curS(x1,b+1,x2,y2);
+                            curS2=curS(x1,y1,x2,b);
+                            tmp=min( dp[k-1][x1][y1][x2][b]+curS1, curS2+dp[k-1][x1][b+1][x2][y2]  );
+                            MIN=min(tmp,MIN);
+                        }
+                        dp[k][x1][y1][x2][y2]=MIN;
+                    }
+                }
+            }
+        }
+    }
+    float aa=sum/n;
+    aa=aa*aa;
+    float X=dp[n-1][0][0][7][7];
+    X=X/n-aa;
+    X=sqrt(X);
+    printf("%.3f\n",X);
+    return 0;
+}
