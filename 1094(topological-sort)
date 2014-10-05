@@ -1,0 +1,128 @@
+#include <iostream>
+#include <stdio.h>
+#include <cstring>
+using namespace std;
+int n,m;
+char top_out[26];
+int po=0;
+ 
+typedef class {
+public:
+    int in; //入度
+    char to[26]; //记录指向的所有节点,以便删除出度的操作
+    int pt; //数组to的指针
+} degree ;
+ 
+int top_sort(degree alph[], bool mark[], int num){
+    memset(top_out, '\0', sizeof(top_out));
+    po=0;
+ 
+    int del_n=0;
+    int zero=0; //记录入度为0的节点个数
+    for(int i='A'; i<'A'+n;i++){
+        if(mark[i] && !alph[i].in)
+            zero++;
+    }
+ 
+    bool flag=false;
+    while(zero>0){
+        if(zero>1) //图的入度为零的节点不唯一,排序无法确定
+            flag=true; //考虑到本题"矛盾情况"的优先性,避免在多个0入度节点情况下,最后一步输入刚好出现环(此时为矛盾)
+                        //所有此处先不返回值,而是标记,执行拓扑,根据情况再决定返回值
+        for(int k='A'; k<'A'+n; k++){ //寻找唯一的0入度节点
+                                        //注意此处由于节点较少,每次都搜索一遍费用不高,否则应当用维护一个0入度节点的队列
+            if(mark[k] && !alph[k].in){
+                zero--;
+                mark[k]=false; //删除唯一0入度节点k
+                del_n++;        //记录删除的节点数
+                top_out[po++]=k; //k记录到排序输出列表
+                for(int i=0;i<alph[k].pt;i++){
+                    if( (--alph[ alph[k].to[i] ].in)==0 )
+                        zero++;
+                    
+                }
+                break;
+            }
+        }
+    }
+    if(flag && del_n==num)
+        return 3;
+    if(del_n<num)
+        return 2; //有环
+    if(!flag && del_n==num && del_n<n) //图F能排序,但不能确定图G能否排序,还需继续输入观察
+        return 3;
+    if(!flag && del_n==n) //图G能排序
+        return 1;
+}
+ 
+int main(void){
+    int num; //标记前n个字母出现次数,用于最终检查是否前n各字母均已被读入
+    bool mark['Z'+1], mark_t['Z'+1]; //标记当前图G所使用的节点
+    degree alph['Z'+1],alph_t['Z'+1];
+    while(1){
+        cin>>n>>m;
+        if(!n || !m)
+            break;
+        memset(mark,false,sizeof(mark));
+        memset(mark_t,false,sizeof(mark_t));
+        num=0;
+        for(int k='A';k<'A'+n;k++){
+            alph[k].in=alph_t[k].in=0;
+            alph[k].pt=alph_t[k].pt=0;
+            memset(alph[k].to, '\0', sizeof(alph[k].to));
+            memset(alph_t[k].to, '\0', sizeof(alph_t[k].to));
+        }
+        char x, symbol, y;
+        bool flag=false;
+        bool sign=false;
+        int value;
+        int step;
+        for(int pair=1; pair<=m; pair++){
+            cin>>x>>symbol>>y;
+            if(x>='A'+n || y>='A'+n) //超范围,不再进行拓扑排序,单纯检查后续输入是否把前n个字母都输入了
+                sign=true;
+            if(!mark[x] && x<'A'+n)
+                num++;
+            if(!mark[y] && y<'A'+n)
+                num++;
+            if(!flag && !sign){
+                value=0;
+                mark[x]=mark[y]=true;
+                mark_t[x]=mark_t[y]=true;
+                alph[y].in++;
+                alph_t[y].in++;
+                alph[x].to[ alph[x].pt++ ]=y;
+                alph_t[x].to[ alph_t[x].pt++ ]=y;
+                /* Top-Sort & Sign */
+                value=top_sort(alph_t,mark_t,num); //每次输入以后图都被更新,要重新拓扑
+                if(value==1 || value ==2){
+                    //排序确认 || 矛盾
+                    step=pair;
+                    flag=true;
+                }else if(value==3 && pair<m){ //排序暂无法确认,需要继续处理后续输入
+                    for(int k='A';k<'A'+n;k++){
+                        mark_t[k]=mark[k];
+                        alph_t[k].in=alph[k].in;
+                    }
+                }
+                if(pair==m && value==0) //最终仍无法确认
+                    value=3;
+            }
+            if(sign && !flag && num==n){
+                step=pair;
+                value=2;
+            }else if(sign && !flag && pair==m && num<n)
+                value=3;
+        }
+        if(value==1){
+            cout<<"Sorted sequence determined after "<<step<<" relations: ";  
+            for(int i=0;i<po;i++)
+                cout<<top_out[i];  
+            cout<<'.'<<endl;
+        }else if(value==2)
+            cout<<"Inconsistency found after "<<step<<" relations."<<endl;
+        else if(value==3)
+            cout<<"Sorted sequence cannot be determined."<<endl;
+    }
+    return 0;
+}
