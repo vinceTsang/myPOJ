@@ -1,0 +1,86 @@
+/**
+ * 将S、E分别视为坐标轴上的X、Y，则转换为求
+ * 一个点在其左上方的点的数量（不包含于自身同一位置的）
+ * 故按y值降序、x值升序排列
+ * 后面的点如果跟前面的点不一样，则前面所有点都位于其左上方
+ * 树状数组求前缀和
+ */
+#include <iostream>
+#include <stdio.h>
+#include <algorithm>
+#include <cstring>
+using namespace std;
+#define M 100004
+int lowbit(int x){ return x&-x; }
+int tree[M];
+typedef struct{
+    int x,y;
+    int num;
+    int ans;
+}XYType;
+void update(int idx,int val){
+    while(idx<=M){
+        tree[idx]+=val;
+        idx+=lowbit(idx);
+    }
+}
+int query(int idx){
+    int sum=0;
+    while(idx>0){
+        sum+=tree[idx];
+        idx-=lowbit(idx);
+    }
+    return sum;
+}
+int cmp(XYType a, XYType b){
+    if(a.y==b.y)
+        return a.x < b.x;
+    return a.y > b.y;
+}
+int cmp_by_num(XYType a, XYType b){
+    return a.num < b.num;
+}
+int main()
+{
+    //freopen("d:\\in.txt","r",stdin);
+    int n,x1,y1,x2,y2,i,tmp;
+    scanf("%d",&n);
+    while(n!=0){
+        memset(tree,0,sizeof(tree));
+        XYType *s=new XYType[n];
+        for(i=0;i<n;i++){
+            scanf("%d%d", &s[i].x, &s[i].y);
+            s[i].num=i;
+        }
+        sort(s,s+n,cmp);
+        x1=s[0].x; y1=s[0].y;
+        int same_count=1;
+        for(i=1;i<n;i++){
+            x2=s[i].x; y2=s[i].y;
+            if(x1!=x2 || y1!=y2){ //完全相同的点在最后一个进行处理
+                tmp=query(++x1);
+                for(int j=0;j<same_count;j++){
+                    s[i-j-1].ans=tmp;
+                }
+                update(x1,same_count);
+                same_count=1;
+            }else{
+                same_count++;
+            }
+            x1=x2; y1=y2;
+        }
+        tmp=query( ++x1 ); //x1===s[n-1].x;
+        for(int j=0;j<same_count;j++){
+            s[n-1-j].ans=tmp;
+        }
+        //update(x1,same_count); 不影响结果
+        sort(s,s+n,cmp_by_num);
+        for(i=0;i<n;i++){
+            printf("%d ",s[i].ans);
+        }
+        printf("\n");
+        delete s;
+        scanf("%d",&n);
+    }
+    return 0;
+}
