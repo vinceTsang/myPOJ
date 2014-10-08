@@ -1,0 +1,78 @@
+/**
+ * 定义delta[i]为A[i]...A[N]的共同增量
+ * 把区间A[s]...A[t]都增加d即为
+ *  1）令delta[s] = delta[s] + d，表示将A[s]...A[N]同时增加d，但这样A[t+1]...A[N]就多加了d，所以
+ *  2）再令delta[t+1] = delta[t+1] - d，表示将A[t+1]...A[N]同时减d
+ * sum[x]表前x个元素的和
+ * delta[i]对sum[x]的贡献值为delta[i]*(x+1-i)， 即下标i至x都增加了delta[i]
+ * sum[x] = org[1]+...+org[x] + delta[1]*x + delta[2]*(x-1) + delta[3]*(x-2)+...+delta[x]*1
+ *        = org[1]+...+org[x] + segma(delta[i]*(x+1-i))
+ *        = segma(org[i]) + (x+1)*segma(delta[i]) - segma(delta[i]*i)，1 <= i <= x
+ * 而后两个segma都可以通过树状数组快速求出（分别用c1、c2维护）
+ * 注意delta[i]*i中的i对于sum中的segma而言是变量，但具体的一个i对c2而言却是一个常数
+ */
+
+#include <stdio.h>
+#define N 100002
+#define lowbit(i) ( i & (-i) ) //取最后一个1
+typedef long long ll;
+ll c1[N]; //树状数组维护delta[i]的前缀和
+ll c2[N]; //维护delta[i]*i的前缀和
+ll sum[N];
+int A[N];
+int n;
+
+ll query(ll *array, int idx){
+    ll sum=0;
+    while(idx>0){
+        sum +=array[idx];
+        idx -= lowbit(idx);
+    }
+    return sum;
+}
+
+void update(ll *array, int idx, ll d){
+    while(idx<=n){
+        array[idx] += d;
+        idx += lowbit(idx);
+    }
+}
+
+int main()
+{
+    //freopen("d:\\in.txt","r",stdin);
+    int q,i,s,t,d;
+    ll ans;
+    char action;
+    scanf("%d %d", &n, &q);
+    for(i=1;i<=n;i++){
+        scanf("%d",A+i);
+    }
+    for(i=1;i<=n;i++){
+        sum[i] = sum[i-1] + A[i];
+    }
+
+    while (q--){
+        getchar();
+        scanf("%c %d %d", &action, &s, &t);
+        if(action == 'Q'){
+            ans=sum[t] - sum[s-1];
+            ans += (t+1)*query(c1,t) - query(c2,t);
+            ans -= (s*query(c1,s-1) - query(c2,s-1));
+            printf("%lld\n",ans);
+        }
+        else{
+            scanf("%d", &d);
+            /**
+             * 为在[s,t]内增加增量d
+             * 则将delta[s]加d，且delta[t+1]减d
+             * 不直接修改delta，而是维护对应的用于求前缀和的树状数组c1、c2
+             */
+            update(c1,s,d); //意味着c1中，包含delta[s]的都增加d
+            update(c1,t+1,-d);
+            update(c2,s,d*s);
+            update(c2,t+1,-d*(t+1));
+        }
+    }
+    return 0;
+}
