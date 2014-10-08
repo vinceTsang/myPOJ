@@ -1,0 +1,82 @@
+#include <iostream>
+#include <stdio.h>
+using namespace std;
+
+int main()
+{
+    int m,n,i,j;
+    char direction='R';
+    scanf("%d%d",&m,&n);
+    int **a=new int*[m];
+    a[0]=new int[m*n];
+    for(i=1;i<m;i++){
+        a[i]=a[i-1]+n;
+    }
+    char alph[26];
+    for(i=0;i<26;i++){
+        alph[i]='A'+i;
+    }
+    int len1=n,len2=m-1,cur=0,num=0;
+    int Rc=0,Lc=0,Uc=0,Dc=0;
+    i=0;j=0;
+    while(num<m*n){
+        a[i][j]=cur%26;
+        ++cur;
+        ++num;
+        switch(direction){
+            case 'R':{
+                if(++Rc == len1){
+                    direction='D';
+                    --len1;
+                    Rc=0;
+                    i++;
+                    break;
+                }
+                j++;
+                break;
+            }
+            case 'D':{
+                if(++Dc == len2){
+                    direction='L';
+                    --len2;
+                    Dc=0;
+                    j--;
+                    break;
+                }
+                i++;
+                break;
+            }
+            case 'L':{
+                if(++Lc == len1){
+                    direction='U';
+                    --len1;
+                    Lc=0;
+                    i--;
+                    break;
+                }
+                j--;
+                break;
+            }
+            case 'U':{
+                if(++Uc == len2){
+                    direction='R';
+                    --len2;
+                    Uc=0;
+                    j++;
+                    break;
+                }
+                i--;
+                break;
+            }
+        }
+    }
+    for(i=0;i<m;i++){
+        for(j=0;j<n;j++){
+            printf("   %c",alph[ a[i][j] ]);
+        }
+        printf("\n");
+    }
+    delete a[0];
+    delete a;
+    return 0;
+}
