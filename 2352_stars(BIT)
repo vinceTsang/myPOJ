@@ -1,0 +1,39 @@
+/**
+ * 由于已经排好序，当前点前面所有点的y坐标都一定小于等于自身
+ * 故不必考虑y。
+ * 启发：对于多维的数据，可以先排序，则其中一维比满足要求，不必考虑
+ */
+#include <iostream>
+#include <cstdio>
+using namespace std;
+int c[32001];
+int a[15001];
+int lowbit(int x){ return x & -x; }
+void update(int idx){
+    while(idx<=32001){
+        c[idx]++;
+        idx+=lowbit(idx);
+    }
+}
+int query(int idx){
+    int sum=0;
+    while(idx>0){
+        sum+=c[idx];
+        idx-=lowbit(idx);
+    }
+    return sum;
+}
+int main(){
+    //freopen("d:\\in.txt","r",stdin);
+    int n,x,y,i;
+    scanf("%d",&n);
+    for(i=0; i<n;i++){
+        scanf("%d%d",&x,&y);
+        a[ query(++x) ]++; //树状数组的实际下标是从1开始的
+        update(x); //先求值再更新则不包含自身
+    }
+    for(i=0;i<n;i++){
+        printf("%d\n",a[i]);
+    }
+    return 0;
+}
