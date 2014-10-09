@@ -1,0 +1,85 @@
+/**
+ * 从后往前考虑
+ * 对最后一个个体而言，它所知的信息是对于所有个体的信息
+ * 第i个体知道其后每个个体的信息同时知道前面所有个体的信息，i的位置也是可求的
+ * 方法是，如果能够确定i的位置为x
+ * 则在x前面比x小的个体数加上在后面比x小的个体数再加1所得tmp_index即必然等于x
+ * 那么可以二分来枚举可能的位置x，当计算得tmp_index等于x时，x即为所求
+ * 否则继续二分估计。
+ * 对于求后面所有比x小的个体数时用树状数组提高效率
+ * 从后向前计算时，每一个已算出的个体位置x，则update(x)
+ * 则对于以后的循环计算而言，意味着小于等于x的个体数增加了一
+ * 所有“求后面比x小”这一步可以是求所有小于等于x-1的个体数，即query(x-1)
+ * 同时用visit数组考虑重复估计此前确定过的位置
+ */
+#include <iostream>
+#include <stdio.h>
+#include <cstring>
+using namespace std;
+int tree[8001];
+int lowbit(int x){ return x&-x; }
+int query(int idx){
+    int sum=0;
+    while(idx>0){
+        sum+=tree[idx];
+        idx-=lowbit(idx);
+    }
+    return sum;
+}
+void update(int idx){
+    while(idx<=8001){
+        tree[idx]++;
+        idx+=lowbit(idx);
+    }
+}
+
+int main()
+{
+    //freopen("d:\\in.txt","r",stdin);
+    int n,i,tmp,guess,st,ed;
+    scanf("%d",&n);
+    int *pre=new int[n+1];
+    int *index=new int[n+1];
+    char visit[80002];
+    pre[0]=0;
+    for(i=1;i<n;i++){
+        scanf("%d",pre+i);
+    }
+    memset(visit,0,sizeof(visit));
+    tmp=pre[n-1]+1;
+    index[n-1]=tmp;
+    update(tmp);
+    visit[tmp]=1;
+    for(i=n-2;i>0;i--){
+        st=pre[i]+1;
+        ed=n;
+        while(st<=ed){
+            guess=(st+ed)/2;
+            tmp=pre[i]+query(guess-1)+1;
+            if(guess==tmp){
+                while(visit[guess]==1)
+                    guess++;
+                index[i]=guess;
+                update(guess);
+                visit[guess]=1;
+                break;
+            }else if(guess>tmp){
+                ed=guess;
+            }else{
+                st=guess+1;
+            }
+        }
+    }
+    for(i=1;i<=n;i++){
+        if(visit[i]!=1){
+            index[0]=i;
+            break;
+        }
+    }
+    for(i=0;i<n;i++){
+        printf("%d\n",index[i]);
+    }
+    delete pre;
+    delete index;
+    return 0;
+}
