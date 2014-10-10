@@ -1,0 +1,56 @@
+/**
+ * 注意到w、h必须严格大于才能将娃娃嵌套
+ * 将w、h任一个升序排列，则另一个得降序排列，如w升h降
+ * 原因是每一个娃娃在从前往后选择已有序的队列加入时（无则自己为首新增队列）
+ * 在遇到两个队列队尾的w相同时，尽可能选择对h要求苛刻的队列，即h更大的队列
+ * 因为下一个娃娃在对同样的这两个队列进行决策是
+ * 要么套在当前娃娃身上，要么考虑后面队列，而后面队列由于h降序，h的要求更加宽松
+ * 即当前的决策为后面留了更大的潜力
+ * 另，用偏序集的Dilworth定理同样能求解。
+ */
+#include <iostream>
+#include <stdio.h>
+#include <algorithm>
+#include <cstring>
+using namespace std;
+const int MAX=20002;
+struct node{
+    int w,h;
+}dolls[MAX],ans[MAX];
+int cmp(node a, node b){
+    if(a.w==b.w) return a.h > b.h;
+    return a.w < b.w;
+}
+int main()
+{
+    //freopen("d:\\in.txt","r",stdin);
+    int T,m,lastW,lastH,i,j,counts;
+    bool flag;
+    scanf("%d",&T);
+    while(T--){
+        scanf("%d",&m);
+        memset(ans,0,sizeof(ans));
+        for(i=0;i<m;i++){
+            scanf("%d%d",&dolls[i].w, &dolls[i].h);
+        }
+        sort(dolls,dolls+m,cmp);
+        counts=0;
+        for(i=0;i<m;i++){
+            flag=false;
+            for(j=0;j<counts;j++){
+                if( (ans[j].h < dolls[i].h) && (ans[j].w < dolls[i].w) ){
+                    ans[j].h=dolls[i].h;
+                    ans[j].w=dolls[i].w;
+                    flag=true;
+                    break;
+                }
+            }
+            if(!flag){
+                ans[counts].h=dolls[i].h;
+                ans[counts++].w=dolls[i].w;
+            }
+        }
+        printf("%d\n",counts);
+    }
+    return 0;
+}
