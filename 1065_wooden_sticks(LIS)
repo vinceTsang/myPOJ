@@ -1,0 +1,52 @@
+/**
+ * 求共有多少个尽可能长的递增子序列
+ * 排序后，一个木棒若能加入到末端则更新末端信息
+ * 否则将作为一个新的头部
+ * 序列数加1
+ */
+#include <iostream>
+#include <stdio.h>
+#include <algorithm>
+#include <cstring>
+using namespace std;
+#define MAX 5005
+
+struct node{
+    int l,w;
+}n[MAX];
+
+int an[MAX];
+bool cmp(node x, node y){
+    if(x.l==y.l) return x.w<y.w;
+    return x.l<y.l;
+}
+int main()
+{
+    //freopen("d:\\in.txt","r",stdin);
+    int t,m,i,j,lastW,num;
+    bool visit[MAX];
+    scanf("%d",&t);
+    while(t--){
+        memset(visit,false,sizeof(visit));
+        scanf("%d",&m);
+        for(i=0;i<m;i++){
+            scanf("%d%d",&n[i].l,&n[i].w);
+        }
+        sort(n,n+m,cmp);
+        num=0;
+        for(i=0;i<m;i++){
+            lastW=n[i].w;
+            if(visit[i]) continue;
+            for(j=i+1;j<m;j++){
+                if(visit[j]) continue;
+                if(lastW <= n[j].w){
+                    visit[j]=true;
+                    lastW=n[j].w;
+                }
+            }
+            num++;
+        }
+        printf("%d\n",num);
+    }
+    return 0;
+}
