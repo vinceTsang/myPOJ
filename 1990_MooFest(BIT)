@@ -1,0 +1,74 @@
+/**
+ * 将牛按照音调v升序排序（x无关）
+ * 则当前牛i只需按照自己的音调Vi跟前面的所有i-1牛沟通即可
+ * 此时用i与前面所有牛的距离之和S乘以Vi即可
+ * 借助两个树状数组求S
+ * 记当前i坐标为X0
+ * 注意到某x小于X0时，距离为X0-x，大于X0时，距离为x-X0
+ * 分别求坐标小于X0和大于X0的距离和(左和右)
+ * 记所有坐标小于X0的坐标之和为LXsum=q(X0-1)，个数为Lcount=p(X0-1)
+ * 则左半边求和为Lcount*X0 - LXsum
+ * 普通数组记录前i头牛的坐标之和为sum(i)。
+ * 则大于X0的坐标之和显然为RXsum=sum(i-1)-LXsum
+ * 个数为Rcount为前i-1个节点减去Lcount(实现时下标从0开始，则取i)，Rcount=i-1-Lcount
+ * 则右半边之和为RXsum-X0*Rcount
+ * S即为RXsum-LXsum+X0*(Lcount-Rcount)=sum(i-1) - 2*q(X0-1) + X0*(2*p(X0-1)-i+1);
+ * 其中LXsum和Lcount分别用树状数组维护即可，查询和更新复杂度均为log(n)
+ * 总复杂度为n*log(n)
+ */
+#include <iostream>
+#include <stdio.h>
+#include <algorithm>
+#define M 20002
+using namespace std;
+typedef long long ll;
+int lowbit(int x){ return x&-x; };
+ll Xsum[M];
+ll counts[M]; //ll是为了调用统一
+
+typedef struct{
+    int v,x;
+}COW;
+int cmp(COW a,COW b){
+    return a.v < b.v;
+}
+ll query(ll *array, int idx){
+    ll sum=0;
+    while(idx>0){
+        sum+=array[idx];
+        idx-=lowbit(idx);
+    }
+    return sum;
+}
+void update(ll *array, int idx, int val){
+    while(idx<=M){
+        array[idx]+=val;
+        idx+=lowbit(idx);
+    }
+}
+int main(){
+    //freopen("d:\\in.txt","r",stdin);
+    COW cows[M];
+    ll sum[M];
+    ll ans=0,ss;
+    int n,i;
+    scanf("%d",&n);
+    for(i=0;i<n;i++){
+        scanf("%d%d",&cows[i].v, &cows[i].x);
+    }
+    sort(cows,cows+n,cmp);
+    update(counts,cows[0].x,1);
+    sum[0]=cows[0].x;
+    update(Xsum,cows[0].x, cows[0].x);
+    int x0;
+    for(i=1;i<n;i++){
+        x0=cows[i].x;
+        ss=sum[i-1] - 2*query(Xsum,x0-1) + x0*( 2*query(counts,x0-1)-i);
+        ans += ss*cows[i].v;
+        update(counts,x0,1);
+        update(Xsum,x0,x0);
+        sum[i]=sum[i-1]+x0;
+    }
+    printf("%lld\n",ans);
+    return 0;
+}
