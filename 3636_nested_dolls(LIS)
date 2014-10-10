@@ -24,7 +24,7 @@ int cmp(node a, node b){
 int main()
 {
     //freopen("d:\\in.txt","r",stdin);
-    int T,m,lastW,lastH,i,j,counts;
+    int T,m,i,j,counts;
     bool flag;
     scanf("%d",&T);
     while(T--){
