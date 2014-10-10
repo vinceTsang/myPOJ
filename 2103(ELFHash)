@@ -1,0 +1,55 @@
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#define N 100003
+#define Mod 100003
+using namespace std;
+struct node{
+    char eng[20],foreign[20];
+    int next;
+}word[N];
+int first[N];
+int m;
+int ELFHash(char *key){
+    unsigned long g,h=0;
+    while(*key){
+        h=(h<<4)+*key++;
+        g=h & 0xf0000000L;
+        if(g) h^=g>>24;
+        h&=~g;
+    }
+    return h%Mod;
+}
+void insert(char english[], char foreign[]){
+    strcpy(word[m].eng,english);
+    strcpy(word[m].foreign,foreign);
+    int h=ELFHash(foreign);
+    word[m].next=first[h]; //拉链法，将当前hash值的链头存到next域。
+    first[h]=m++; //m是在word中的真正索引，
+}
+int find(char foreign[]){
+    int h=ELFHash(foreign);
+    for(int i=first[h];i!=-1;i=word[i].next){ //从当前hash值的链头开始找，找到的word的nest即是链的下一个值
+        if(strcmp( word[i].foreign,foreign )==0 ) return i;
+    }
+    return -1;
+}
+int main()
+{
+    //freopen("d:\\inputDate.txt","r",stdin);
+    char str[100];
+    m=0;
+    memset(first,-1,sizeof(first));
+    while(gets(str)){
+        if(str[0]==0) break;
+        char a[20],b[20];
+        sscanf(str,"%s %s",a,b);
+        insert(a,b);
+    }
+    while(scanf("%s",str)!=EOF){
+        int ans=find(str);
+        if(ans>=0) printf("%s\n",word[ans].eng);
+        else printf("eh\n");
+    }
+    return 0;
+}
