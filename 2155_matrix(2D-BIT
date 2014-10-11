@@ -1,0 +1,65 @@
+/**
+ * 矩阵更新时只更新四个角，且将矩阵右下角横纵坐标各增加1
+ * 查询时查找包括自己在内的左上角的所有和
+ * 奇数则表示自身为1
+ * 二维树状数组实现高效维护前缀和
+ */
+#include <iostream>
+#include <stdio.h>
+#include <cstring>
+using namespace std;
+const int MAX=1003;
+int tree[MAX][MAX];
+int lowbit(int k){ return k&-k; }
+void update(int X, int Y){
+    int yy;
+    while(X<=MAX){
+        yy=Y;
+        while(yy<=MAX){
+            tree[X][yy]++;
+            yy+=lowbit(yy);
+        }
+        X+=lowbit(X);
+    }
+}
+int query(int X, int Y){
+    int yy,sum=0;
+    while(X>0){
+        yy=Y;
+        while(yy>0){
+            sum+=tree[X][yy];
+            yy-=lowbit(yy);
+        }
+        X-=lowbit(X);
+    }
+    return sum;
+}
+int main()
+{
+    //freopen("d:\\in.txt","r",stdin);
+    int __T,i,ans,N,times,x,y,x2,y2;
+    char cmd;
+    scanf("%d",&__T);
+    while(__T--){
+        memset(tree,0,sizeof(tree));
+        scanf("%d %d",&N,&times);
+        for(i=0;i<times;i++){
+            getchar();
+            scanf("%c %d %d",&cmd, &x, &y);
+            if(cmd=='C'){
+                scanf("%d %d",&x2, &y2); //将矩形右下角拉至x2+1，y2+1是因为查询操作是包含自身的，微调
+                update(x,y);
+                update(x,y2+1);
+                update(x2+1,y);
+                update(x2+1,y2+1);
+            }
+            else if(cmd=='Q'){
+                ans=query(x,y);
+                ans%=2;
+                printf("%d\n",ans);
+            }
+        }
+        printf("\n");
+    }
+    return 0;
+}
