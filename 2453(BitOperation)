@@ -1,0 +1,17 @@
+/**
+ * 位运算
+ * 对于最后一串k个连续的1,将最前面的1往前挪一位,剩下的k-1个1挪到最低位
+ * 实现方法是,用x=n&-n找到最后一个1,加上这个1以后,再在末尾加上k-1个1
+ * 由于n ^ n+x 得到的是k+1个1,将他们除以x则移至最低位
+ * 再右移两位则得到最低位的k-1个1.
+ */
+#include <stdio.h>
+#include <iostream>
+using namespace std;
+int main(){
+    int n,x;
+    while(scanf("%d",&n),n){
+        x=n&-n;
+        printf("%d\n",n+x + (n ^ n+x)/x/4);
+    }
+}
