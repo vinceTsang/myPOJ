@@ -1,0 +1,50 @@
+#include <iostream>
+#include <stdio.h>
+using namespace std;
+const int MAXN=60000;
+int a[MAXN];
+int stack[MAXN];
+int top;
+int binary_search(int x){
+    int st=1,ed=top,mid;
+    while(st<ed){
+        mid=(st+ed)/2;
+        if(stack[mid]==x) return mid;
+        if(stack[mid]<x){
+            ed=mid;
+        }else{
+            st=mid+1;
+        }
+    }
+    return st; //不等时返回值为恰好大于x的位置+1
+}
+int main(){
+    int x,i,j,n,T=0;
+    while(1){
+        scanf("%d",&x);
+        if(x==-1) break;
+        i=0;
+        while(x!=-1){
+            a[i++]=x;
+            scanf("%d",&x);
+        }
+        n=i;
+        stack[0]=32768;
+        top=0;
+        for(i=0;i<n;i++){
+            if(a[i]<stack[top]){
+                stack[++top]=a[i];
+            }else{
+                stack[ binary_search(a[i]) ] = a[i];
+                //a[i]对桟中该元素的替换并不意味着a[i]属于最终的序列
+                //只是该替换并没有改变当前序列长度
+                //且使得序列对后面元素的纳入而言更具潜力
+                //实际上,若最终长度大于a[i]进入时的长度
+                //或a[i]在桟中的位置之后的所有元素都被替换了
+                //才能说a[i]加入到了最终的序列
+                //否则可以说a[i]并没有替换原本元素,原本元素导致了当前长度
+            }
+        }
+        printf("Test #%d:\n  maximum possible interceptions: %d\n\n",++T,top);
+    }
+}
