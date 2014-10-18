@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <iostream>
+using namespace std;
+const int MAXN=40002;
+//int a[MAXN];
+int stack[MAXN];
+int top;
+int binary_search(int x){
+    int st=1,ed=top,mid;
+    while(st<ed){
+        mid=(st+ed)/2;
+        if(stack[mid]==x) return x; //never happen
+        if(stack[mid]<x){
+            st=mid+1;
+        }else{
+            ed=mid;
+        }
+    }
+    return st;
+}
+int main(){
+    int T,n,i,tmp;
+    scanf("%d",&T);
+    while(T--){
+        scanf("%d",&n);
+        stack[0]=0;
+        top=0;
+        for(i=0;i<n;i++){
+            scanf("%d",&tmp);
+            if(tmp>stack[top]){
+                stack[++top]=tmp;
+            }else{
+                stack[ binary_search(tmp) ] = tmp;
+            }
+        }
+        printf("%d\n",top);    
+    }
+    return 0;
+}
