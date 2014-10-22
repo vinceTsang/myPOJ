@@ -1,0 +1,61 @@
+#include <iostream>
+#include <math.h>
+#include <stdio.h>
+using namespace std;
+const int size=31269;
+unsigned a[size]; //第i组bit序列的长度
+unsigned s[size]; //前i组bit序列的长度和
+
+int binary_search(int x){
+    int st=1,ed=size, mid;
+    while(st<=ed){
+        mid=(st+ed)/2;
+        if(x==s[mid]) return mid;
+        if(x > s[mid]){ //只要比当前大,一定不属于该组,可能属于后一组.故返回时根据st
+            st=mid+1;
+        }else{
+            ed=mid-1;
+        }
+    }
+    return st; //返回x位于的组的序号
+}
+
+void play_table(void){
+    a[1]=s[1]=1;
+    for(int i=2;i<size;i++){
+        a[i]=a[i-1]+(int)log10((double)i)+1; //log项表示数字i的位数
+        s[i]=s[i-1]+a[i];
+    }
+    return;
+}
+
+int compute(int n){
+    int i=1,j;
+    //while(s[i]<n)
+    //    i++; //确定组.可用2分.但数据规模不算大.当前算法已经0ms
+    i = binary_search(n);
+    int pos=n-s[i-1]; //pos为n在第i组的下标
+    int len=0;
+    j=0;
+    while(len<pos){
+        j++;
+        len += (int)log10((double)j)+1;
+    }
+    return j/(int)pow((double)10,len-pos) % 10;
+        //j所指位置为n所在的整数integer
+        //len是该整数尾部bit在第i组的长度
+        //len-pos即pos位置后多余的bit位数
+        //删除多余的数字再对10取模即可
+        //如要取出整数1234中的2,1234/100删除多余的34得12.取模得2
+}
+int main(){
+    play_table();
+    int T;
+    scanf("%d",&T);
+    while(T--){
+        int n;
+        scanf("%d",&n);
+        printf("%d\n",compute(n));
+    }
+    return 0;
+}
