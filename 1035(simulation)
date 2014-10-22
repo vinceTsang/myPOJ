@@ -1,0 +1,62 @@
+#include <iostream>
+#include <stdio.h>
+using namespace std;
+#include <string.h>
+char map[10010][16];
+char str[30];
+int isok(int n){
+    int i,j,k;
+    int l1=strlen(str), l2=strlen(map[n]);
+    switch(l1-l2){
+    case 1:
+        k=0;
+        for(i=j=0;i<l1;)
+            if(str[i]!=map[n][j])
+                k++,i++;
+            else
+                i++,j++;
+        if(k==1) //各操作都只有1位可以不想等
+            return 1;
+        break;
+    case 0:
+        k=0;
+        for(i=j=0;i<l1;i++,j++)
+            if(str[i]!=map[n][j])
+                k++;
+        if(k==1)
+            return 1;
+        break;
+    case -1:
+        k=0;
+        for(i=j=0;i<l2;)
+            if(str[i]!=map[n][j])
+                k++,j++;
+            else
+                i++,j++;
+        if(k==1)
+            return 1;
+        break;
+    }
+    return 0;
+}
+int main(){
+    int i=0,N=0;
+    while(scanf("%s",map[N]), strcmp(map[N],"#")!=0) N++;
+    while(scanf("%s",str), strcmp(str,"#")!=0){
+        for(i=0; i<N; i++){
+            if(strcmp(str,map[i])==0){
+                printf("%s is correct\n",str);
+                break;
+            }
+        }
+        if(i==N){
+            printf("%s:",str);
+            for(i=0; i<N; i++){
+                if(isok(i))
+                    printf(" %s",map[i]);
+            }
+            printf("\n");
+        }
+    }
+    return 0;
+}
