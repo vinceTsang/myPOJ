@@ -1,0 +1,26 @@
+#include<iostream>
+#include <stdio.h>
+#include<cmath>  
+using namespace std;  
+int main()  
+{
+          float vs,r,c;  
+          int n;  
+          cin>>vs;  
+          cin>>r;  
+          cin>>c;  
+          cin>>n;  
+          float *w=new float[n];  
+          for(int i=0;i<n;i++)  
+          {
+              cin>>w[i];  
+          }  
+          for(int i=0;i<n;i++)  
+          {
+              float r1=c*r*w[i]*vs;
+              float r2=1+pow(c*r*w[i],2);
+              float result=r1/sqrt(r2);  
+              printf("%.3f\n",result);  
+          }  
+          return 0;
+}
