@@ -1,0 +1,72 @@
+/**
+ * 深搜
+ * 从下到到,从左到右放蛋糕块
+ * 每层搜索展开时从大到小考虑剩余蛋糕块
+ * 盒子切割为单位格子,用len[i]记录第i列已占用的单位格子数
+ * len必然是紧凑的不会中空,因为一旦大块放不进时必然会填进小块
+ * 都放不下则回溯,且每次都考虑len最小的列,即水平位置最低的列
+ * 蛋糕是否能放下取决于当前块所在第一列放后不越界
+ * 且后面各列与第一列原本都等高,否则后面只可能突出(不可能更低,低者在前面会被作为第一列)
+ * 这导致该块无法放入
+ */
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+using namespace std;
+#define maxl 11
+#define maxn 17
+
+int cnt[maxl]; //记录对应边长的正方形个数
+int side, n, area;
+int len[maxl * maxn]; //len[i]标记第i列已占用的格子数
+bool chk(int used){
+    if(used==n) return true;
+    int minl = 110, p =-1;
+    for(int i=0; i<side; i++)
+        if(minl > len[i]){
+            minl = len[i];
+            p=i;
+        }
+    for(int i=maxl-1; i>0; i--) //从大的蛋糕开始能减少回溯次数,因小块先放可能占用大块所必须的空间
+        if(cnt[i] && len[p] + i <= side && p+i <= side){
+            bool ok = true;
+            for(int j = p+1; j < p + i; j++) //p为占用最少的列,要求其身后的列占用的格子数跟他相等,否则后面的列将突起
+                if(len[j]!=len[p]){        //无法放当前蛋糕
+                    ok = false;
+                    break;
+                }
+            if(ok){
+                cnt[i]--;
+                for(int j = p; j < p+ i; j++)
+                    len[j] += i;            //占用
+                if(chk(used+1)) return true;
+                for(int j=p; j<p+i; j++)
+                    len[j] -= i;
+                cnt[i]++;
+            }
+        }
+    return false;
+}
+
+int main(){
+    int t;
+    scanf("%d",&t);
+    while(t--){
+        memset(len,0,sizeof(len));
+        memset(cnt,0,sizeof(cnt));
+        scanf("%d%d",&side,&n);
+        area=0;
+        for(int i=0; i<n; i++){
+            int a;
+            scanf("%d",&a);
+            cnt[a]++;
+            area += a*a;
+        }
+        if(area == side * side && chk(0))
+            printf("KHOOOOB!\n");
+        else
+            printf("HUTUTU!\n");
+    }
+    return 0;
+}
