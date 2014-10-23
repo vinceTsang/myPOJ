@@ -1,0 +1,85 @@
+/**
+ * 二维dp做法,滚动数组优化空间
+ * dp[i][j]表示时间i时门打开程度为j的最大繁荣度
+ * 则转移方程为dp[i][j]=max(dp[i-1][j-1], dp[i-1][j], dp[i-1][j+1]) + p[x].
+ * 其中下标为x的歹徒其t和s分别等于i和j
+ *
+ * ps:另一方法是用一维dp做.见另一文件
+ */
+#include <iostream>
+#include <cstdio>
+#include <algorithm>
+#include <cstring>
+using namespace std;
+int dp[2][102]; //每次计算只需前一轮的信息,故用二维滚动数组优化空间
+struct g{
+    int t,p,s;
+}gangsters[102];
+int cmp(g g1, g g2){
+    return g1.t<g2.t;
+}
+int main(){
+    int N,K,T,i,j,x,tmp;
+    scanf("%d %d %d",&N,&K,&T);
+    for(i=0;i<N;i++) scanf("%d",&gangsters[i].t);
+    for(i=0;i<N;i++) scanf("%d",&gangsters[i].p);
+    for(i=0;i<N;i++) scanf("%d",&gangsters[i].s);
+    sort(gangsters,gangsters+N,cmp);
+    memset(dp,0,sizeof(dp));
+    //0时刻门为0,无法进人.
+    x=0;
+    int round,pre_round;;
+    for(i=1;i<=T;i++){
+        round=i%2;
+        pre_round=round^1;
+        bool hasUpdate = false;
+        while(x<N){ //x在内部没初始化,总体只执行一遍
+            if(gangsters[x].t < i){
+                x++; continue;
+            }
+            if(gangsters[x].t == i){ 
+                tmp=dp[round][0]; //实际可以让下标都从1开始从而统一处理,而不必头部单独处理
+                tmp=max(tmp, dp[pre_round][0]);
+                tmp=max(tmp, dp[pre_round][1]);
+                dp[round][0]=tmp;
+                int cur_s=gangsters[x].s;
+                //s不为0
+                for(j=1;j<=K;j++){
+                    tmp=dp[round][j]; //前一此x值可能对所有j值都更新了一遍,故在此需考虑原值
+                    tmp=max(tmp,dp[pre_round][j]);
+                    tmp=max(tmp,dp[pre_round][j+1]);
+                    tmp=max(tmp,dp[pre_round][j-1]);
+                    dp[round][j]=tmp;
+                    if(cur_s==j && j <=i ){ //时间i门最大为j,更大的此时不能加进来
+                        dp[round][j] += gangsters[x].p;
+                    }
+                }
+                hasUpdate = true;
+                x++;
+            }else
+                break;
+        }
+        if(!hasUpdate){
+            //没有任何人的t等于当前i
+            tmp=dp[round][0];
+            tmp=max(tmp,dp[pre_round][0]);
+            tmp=max(tmp,dp[pre_round][1]);
+            dp[round][0]=tmp;
+            for(j=1;j<=K;j++){
+                tmp=max( dp[pre_round][j], dp[pre_round][j+1] );
+                tmp=max( tmp, dp[pre_round][j-1]);
+                dp[round][j]=tmp;
+            }
+        }
+        if(x>=N)
+            break;
+    }
+    if(i>T) i--;
+    i=i%2;
+    tmp=0;
+    for(j=0;j<=K;j++){
+        tmp=max( dp[i][j], tmp );
+    }
+    printf("%d\n",tmp);
+    return 0;
+}
