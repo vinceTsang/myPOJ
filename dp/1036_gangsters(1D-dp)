@@ -1,0 +1,42 @@
+/**
+ * 一维dp做法
+ * dp[i]表示第i个人成功进去后所能获得的总繁荣度,为-1则表示第i人没进去
+ * 则dp[i]=max(dp[j])+g[i].p,其中满足abs(ti-tj) >= abs(si-sj)
+ * 即s的变化能够在对应时间间隔内完成
+ */
+#include <iostream>
+#include <cstring>
+#include <cstdio>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+const int maxn = 100 +5;
+struct gang {
+    int p,s,t;
+    bool operator < (const gang& ano) const{
+        return t < ano.t;
+    }
+}g[maxn];
+int n,k,t;
+int ans[maxn];
+int main(){
+    scanf("%d%d%d",&n,&k,&t);
+    for(int i=1; i<=n; i++) scanf("%d",&g[i].t);
+    for(int i=1; i<=n; i++) scanf("%d",&g[i].p);
+    for(int i=1; i<=n; i++) scanf("%d",&g[i].s);
+    memset(ans,0,sizeof(ans));
+    g[0].t=g[0].s=g[0].p=0;
+    sort(g+1,g+n+1);
+    int maxans=0;
+    for(int i=1; i<=n; i++){
+        ans[i]=-1;
+        for(int j=0; j < i; j++){
+            if(ans[j]==-1) continue; //要求前面的状态是可到达的
+            int tmp = abs(g[i].s - g[j].s);
+            if(tmp > g[i].t - g[j].t) continue; //从前一个状态转移过来需要满足在这时间间隔内s变化不过大
+            ans[i] = max(ans[i],ans[j]+g[i].p);
+        }
+        maxans=max(maxans,ans[i]);
+    }
+    cout<<maxans<<endl;
+}
