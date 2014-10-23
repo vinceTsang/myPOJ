@@ -1,0 +1,76 @@
+#include <iostream>
+#include <cstdio>
+#include <string>
+#include <cstring>
+#include <map>
+using namespace std;
+map<char,string> ch2code;
+
+char find_ch(string a){
+    if(a==ch2code['_']) return '_';
+    if(a==ch2code[',']) return ',';
+    if(a==ch2code['.']) return '.';
+    if(a==ch2code['?']) return '?';
+    for(int i=0;i<26;i++){
+        if(a==ch2code['A'+i])
+            return 'A'+i;
+    }
+}
+int main()
+{
+    //map的插入无法在全局进行
+    ch2code['A']=".-";      ch2code['B']="-...";
+    ch2code['C']="-.-.";    ch2code['D']="-..";
+    ch2code['E']=".";       ch2code['F']="..-.";
+    ch2code['G']="--.";     ch2code['H']="....";
+    ch2code['I']="..";      ch2code['J']=".---";
+    ch2code['K']="-.-";     ch2code['L']=".-..";
+    ch2code['M']="--";      ch2code['N']="-.";
+    ch2code['O']="---";     ch2code['P']=".--.";
+    ch2code['Q']="--.-";    ch2code['R']=".-.";
+    ch2code['S']="...";     ch2code['T']="-";
+    ch2code['U']="..-";     ch2code['V']="...-";
+    ch2code['W']=".--";     ch2code['X']="-..-";
+    ch2code['Y']="-.--";    ch2code['Z']="--..";
+    ch2code['_']="..--";    ch2code[',']=".-.-";
+    ch2code['.']="---.";    ch2code['?']="----";
+
+    int T,msg_len,codes_len,cur_len,i,j,k;
+    char msg[102];
+    char ans[102];
+    char codes[102*4];
+    char cur[5];
+    int nums[102];
+    map<char,string>::iterator iter;
+    scanf("%d",&T);
+    int times=0;
+    while(times!=T){
+        scanf("%s",msg);
+        msg_len=strlen(msg);
+        k=0;
+        for(i=0;i<msg_len;i++){
+            strcpy( cur, ch2code[ msg[i] ].c_str() );
+            cur_len=strlen(cur);
+            nums[i]=cur_len;
+            for(j=0;j<cur_len;j++){
+                codes[k++]=cur[j];
+            }
+        }
+        codes[k]='\0';
+        codes_len=k;
+        k=0;
+        int ans_index=0;
+        for(i=msg_len-1;i>-1;i--){
+            cur_len=nums[i];
+            for(j=0;j<cur_len;j++){
+                cur[j]=codes[k++];
+            }
+            cur[cur_len]='\0';
+            string cur_str=cur;
+            ans[ans_index++]=find_ch(cur_str);
+        }
+        ans[ans_index]='\0';
+        printf("%d: %s\n",++times,ans);
+    }
+    return 0;
+}
