@@ -1,0 +1,52 @@
+/**
+ * 判断一个数是否时循环数
+ * 大整数乘法
+ * 同时将原数字在自身后面再接一遍自身
+ * 则任意数若能循环则必时上述这个双倍原数字串的子串
+ * 判断是否为子串只需用cstring中的strstr
+ * 也可用STL中的string::find
+ */
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+using namespace std;
+int main(){
+    int num[60],MulNum[60],i,j,k,len;
+    char ori_str[61],num_str[61],exp_str[121]; //exp_str为两个ori_str连接
+    int tmp,carry,flag;
+    while(scanf("%s",ori_str)!=EOF){
+        flag=1;
+        strcpy(exp_str,ori_str);
+        len=strlen(ori_str);
+        for(i=0;i<len;i++){
+            exp_str[len+i]=ori_str[i];
+            num[i]=ori_str[i]-'0';
+        }
+        exp_str[len+i]='\0';
+        for(i=2;i<=len;i++){
+            carry=0;
+            for(j=len-1;j>-1;j--){
+                MulNum[j]=num[j]*i+carry;
+                if(MulNum[j]>9){
+                    tmp=MulNum[j];
+                    MulNum[j] %= 10;
+                    carry=tmp/10;
+                }else
+                    carry=0;
+                num_str[j]=MulNum[j]+'0';
+            }
+            if(carry){ //进位最终若不为0,则不满足
+                flag=0;
+                break;
+            }
+            num_str[len]='\0';
+            if(strstr(exp_str,num_str)==NULL){
+                flag=0;
+                break;
+            }
+        }
+        if(flag) printf("%s is cyclic\n",ori_str);
+        else printf("%s is not cyclic\n",ori_str);
+    }
+    return 0;
+}
