@@ -1,0 +1,45 @@
+/**
+ * 若某节点(机场)无后继，则sg为0
+ * 某节点到其后继以后，进行完全相同的博弈，无须分解sg
+ * 因而可以不用sg函数，直接返回真值(判断P、N节点)
+ * 已访问过的不能再访问，用flag标记
+ */
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+using namespace std;
+const int MAXN=1002;
+bool flag[MAXN];
+int k,  ans;
+bool mmap[MAXN][MAXN];
+int dfs(int start){
+    for(int i=0; i<MAXN; i++){
+        if(mmap[start][i] && !flag[i]){
+            flag[start]=true; //暂时标记
+            if(!dfs(i)){
+                flag[start]=false; //此处标记false是为了不影响另一种可行走法
+                ans=i; //调用链最后一次返回即为所求，全局变量节省了一个参数
+                return true; //当前节点为N节点
+            }
+            flag[start]=false; //从start向后探索没到达终止节点，撤回
+        }
+    }
+    return false; //当前节点无有效后继(即本身为终止节点，P)，或该节点的所有后继都是N节点，则自身属于P
+}
+int main()
+{
+    int i,n,x,y;
+    while(scanf("%d%d",&n,&k)!=EOF){
+        memset(flag,false,sizeof(flag));
+        memset(mmap,false,sizeof(mmap));
+        for(i=0;i<n-1;i++){
+            scanf("%d%d",&x,&y);
+            mmap[x][y]=mmap[y][x]=true;
+        }
+        if(dfs(k))
+            printf("First player wins flying to airport %d\n",ans);
+        else
+            printf("First player loses\n");
+    }
+    return 0;
+}
