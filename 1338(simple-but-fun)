@@ -1,0 +1,71 @@
+#include <iostream>
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+int main(){
+    int n;
+    int i2_mul=1,i3_mul=1,i5_mul=1;
+    long ugly[1501];
+    ugly[1]=1;
+    for(int i=2;i<=1500;i++){
+        ugly[i]=min(ugly[i2_mul]*2,min(ugly[i3_mul]*3,ugly[i5_mul]*5));
+        if(ugly[i]==ugly[i2_mul]*2)
+            i2_mul++;
+        if(ugly[i]==ugly[i3_mul]*3) //此处不能用else，存在公共的情况
+            i3_mul++;
+        if(ugly[i]==ugly[i5_mul]*5)
+            i5_mul++;
+    }
+    while(scanf("%d",&n),n!=0)
+        printf("%d\n",ugly[n]);
+}
+
+
+//次为纯枚举做法，TLE
+/*
+const int MAXN=100000;
+int memo[MAXN];
+bool check(int n){
+    for(int m=2; m<=n ;){
+        /**
+         * 先质因数分解N
+         * 初始状态，M = 2
+         * 用M试除N，若能整除，说明M为N的质因数，则更新N = N / M，M不变
+         * 若不能整除，则N不变，M++
+         * 不必考虑M是否为质数，若不是，则M必能分解为P*x
+         * P将先整除N
+         *
+        if(memo[n]!=-1){
+            return memo[n];
+        }
+        if(n%m==0){
+            n /= m;
+            if(m!=2 && m!=3 && m!=5){
+                memo[n]=0;
+                return false;
+            }
+        }else{ m++; }
+    }
+    memo[n]=1;
+    return true;
+}
+int main()
+{
+    int n,i,k;
+    memset(memo,-1,sizeof(memo));
+    while(scanf("%d",&n),n!=0){
+        if(n==1){
+            printf("1\n");
+            continue;
+        }
+        k=1;i=2;
+        while(k<n){
+            if(check(i))
+                k++;
+            i++;
+        }
+        printf("%d\n",--i);
+    }
+    return 0;
+}
+*/
