@@ -34,10 +34,10 @@ bool check(int x,int y){
 }
 int MinSearch(int x,int y,int beta);
 int MaxSearch(int x,int y,int alpha){
-    cout<<"begin Max in "<<x<<" "<<y<<endl;
+    //cout<<"begin Max in "<<x<<" "<<y<<endl;
     int ans=-inf;
     if(check(x,y)){
-        cout<<"check in Max!"<<endl;
+        //cout<<"check in Max!"<<endl;
         return ans; //已结束
     }
     if(chess==16) return 0; //平局
@@ -46,12 +46,21 @@ int MaxSearch(int x,int y,int alpha){
             if(str[i][j]=='.'){
                 str[i][j]='x'; chess++;
                 int tmp=MinSearch(i,j,ans);
-                cout<<"MAXSearch "<<tmp<<" === "<<ans<<" === "<<alpha<<endl;
+                //cout<<"MAXSearch "<<tmp<<" === "<<ans<<" === "<<alpha<<endl;
                 str[i][j]='.'; chess--;
                 ans=max(ans,tmp);
+                /*
+                 * 作为Max过程，返回值尽可能大，而当前已计算出ans
+                 * 则最小返回ans，不可能更小
+                 * 即对于该过程的父Min过程(希望达到最小)而言，最优只能在当前过程获得ans的值。
+                 * 如果ans已经比传入的alpha要大
+                 * (注意该alpha实际是父Min过程的beta值，该值意味着父亲至少已经能达到beta值)
+                 * 那么当前Max过程不必再搜索下去了，继续搜索对于父过程而言结果不会更好
+                 * 于是父过程完全舍弃该子Max过程，要求当前过程立即终止
+                 */
                 //对方需要找的最差估价,如果当前比之前最高的高,剪枝
                 if(ans>=alpha) {
-                    cout<<"found in MAX!!"<<endl<<endl;
+                    //cout<<"found in MAX!!"<<endl<<endl;
                     return ans;
                 }
             }
@@ -59,10 +68,10 @@ int MaxSearch(int x,int y,int alpha){
     return ans;
 }
 int MinSearch(int x,int y,int beta){
-    cout<<"begin Min in "<<x<<" "<<y<<endl;
+    //cout<<"begin Min in "<<x<<" "<<y<<endl;
     int ans=inf;
     if(check(x,y)){
-        cout<<"check in Min!"<<endl;
+        //cout<<"check in Min!"<<endl;
         return ans;
     }
     if(chess==16) return 0;
@@ -71,12 +80,20 @@ int MinSearch(int x,int y,int beta){
             if(str[i][j]=='.'){
                 str[i][j]='o'; chess++;
                 int tmp=MaxSearch(i,j,ans);
-                cout<<"MINSearch "<<tmp<<" === "<<ans<<" === "<<beta<<endl;
+                //cout<<"MINSearch "<<tmp<<" === "<<ans<<" === "<<beta<<endl;
                 str[i][j]='.'; chess--;
                 ans=min(ans,tmp);
-                //自己找的需要的最高估价,如果当前比之前的最差的低,剪枝
+                /*
+                 * 作为Min过程，返回值尽可能小，而当前已计算出ans
+                 * 则最大返回ans，不可能更大
+                 * 即对于该过程的父Max过程而言，最多只能在当前过程获得ans的值。
+                 * 如果ans已经比传入的beta要小
+                 * (注意该beta实际是父Max过程的alpha值，该值意味着父亲最少已经能得到alpha值)
+                 * 那么当前Min过程不必再搜索下去了，继续搜索对于父过程而言结果不会更好
+                 * 于是父过程完全舍弃该子Min过程，要求当前过程立即终止
+                 */
                 if(ans<=beta){
-                    cout<<"found in MIN!!"<<endl<<endl;
+                    //cout<<"found in MIN!!"<<endl<<endl;
                     return ans;
                 }
             }
@@ -99,9 +116,11 @@ bool solve(){
                     return true;
                 }
             }
-    return true;
+    return false;
 }
 int main(){
+    //freopen("d:\\inputDate.txt","r",stdin);
+    //freopen("d:\\outputDate.txt","w",stdout);
     char ch[5];
     while(scanf("%s",ch)!=EOF && ch[0]!='$'){
         chess=0;
