@@ -1,0 +1,31 @@
+/**
+ * 开关灯问题
+ * 如果某个灯被操作了偶数次，则不变
+ * 求变化的情况即求被操作奇数次的灯个数
+ * 编号为n的灯被操作次数显然为n约数的个数
+ * 已知任一个数均有两数相乘而得
+ * 当一个数为完全平方数时，“两数相乘”会出现有两个数相等的情况
+ * 而非完全平方数中均不相等
+ * 故完全平方数有奇数个约数
+ * 非...有偶数个约数
+ * 因此求出完全平方数的个数即可
+ */
+#include <iostream>
+#include <cstdio>
+using namespace std;
+
+int main()
+{
+    int T,n,tmp;
+    scanf("%d",&T);
+    while(T--){
+        scanf("%d",&n);
+        tmp=1;
+        while(tmp*tmp<=n){
+            tmp++;
+        }
+        tmp--;
+        printf("%d\n",tmp);
+    }
+    return 0;
+}
