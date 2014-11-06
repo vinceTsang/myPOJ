@@ -1,0 +1,35 @@
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+using namespace std;
+const int MAXN=8000000;
+char text[MAXN];
+int c[128];
+bool Hash[MAXN];
+
+int main()
+{
+    int n,nc,i,j,ans,len,sum;
+    scanf("%d %d",&n,&nc);
+    memset(c,0,sizeof(c));
+    memset(Hash,false,sizeof(Hash));
+    scanf("%s",text);
+    len=strlen(text);
+    j=0;
+    for(i=0;i<len;i++){
+        if(c[text[i]]==0) c[text[i]]=j++;
+        if(j==nc) break;
+    }
+    ans=0;
+    for(i=0;i<=len-n;i++){
+        sum=0;
+        for(j=i;j<=i+n-1;j++)
+            sum = sum*nc + c[text[j]]; //nc进制
+        if(Hash[sum]==false){
+            Hash[sum]=true;
+            ans++;
+        }
+    }
+    printf("%d\n",ans);
+    return 0;
+}
