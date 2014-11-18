@@ -1,0 +1,76 @@
+/**
+ * Trie 字典树
+ * 静态实现
+ * 将字符串按长度降序排序
+ * 则前缀重复时能快速发现
+ * 且由于降序，判断重复时只用检查自身是否是前缀串
+ */
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+struct node{
+    char str[11];
+    int sz;
+}; //树的节点，用于排序
+struct Trie{
+    int cnt;
+    int next[10];
+    void init(){
+        this->cnt=0;
+        memset(this->next,-1,sizeof(this->next));
+    }
+};
+bool consistent; //solve状态标识
+int index; //用来指向静态数组中的可用节点
+node dir[10005]; //存储字典
+Trie tree[100005]; //静态trie树
+int cmp(const node &a, const node &b){ //将dir按字符串长度从大到小排序
+    return a.sz > b.sz;
+}
+void Insert(int root, char *str, int sz){
+    int t=root;
+    int tag,pos=0; //pos为操作字符串的下标
+    while(pos<sz){
+        tag=str[pos]-'0'; //tag为当前字符
+        if(tree[t].next[tag]==-1){ //分配新节点
+            tree[index].init();
+            tree[index].cnt=1;
+            tree[t].next[tag]=index++; //记录当前t节点的一个子节点对应的位置
+        }else{
+            (tree[ tree[t].next[tag] ].cnt)++; //增加计数
+        }
+        if(pos<sz){
+            t=tree[t].next[tag];
+        }
+        pos++;
+    }
+    if(tree[t].cnt>1){ //由于已经按长度降序排序，重复时自身为重复前缀
+        consistent=false;
+    }
+}
+int main()
+{
+    int i,T,n,root;
+    scanf("%d",&T);
+    while(T--){
+        scanf("%d",&n);
+        index=1;
+        consistent=true;
+        for(i=0;i<n;i++){
+            scanf("%s",dir[i].str);
+            dir[i].sz=strlen(dir[i].str);
+        }
+        sort(dir,dir+n,cmp); //排序后相同前缀能更快检测出
+        root=0;
+        tree[root].init();
+        for(i=0;i<n;i++){
+            Insert(root,dir[i].str,dir[i].sz);
+            if(!consistent) break;
+        }
+        if(!consistent) printf("NO\n");
+        else printf("YES\n");
+    }
+    return 0;
+}
