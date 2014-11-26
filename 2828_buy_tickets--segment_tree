@@ -1,0 +1,58 @@
+/**
+ * 线段树单点更新
+ * 带有序号v的人能够直接插队至位置pos之后
+ * pos的意义为找到一个位置可以放置当前的人
+ * 使得从这个位置往前数共有pos个空位
+ * 线段树的节点中cnt表示在[l,r)区间中共有多少空位
+ * 逆序插入，原因是，插入区间后区间空位立即减一，即先插入者优先占据空间
+ * 而实际逻辑却是后来的人能够直接插队，更优先
+ */
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+#define L(x) (x<<1)
+#define R(x) (x<<1|1)
+#define MAXN 200020
+using namespace std;
+struct NODE{
+    int l,r,cnt;
+}node[MAXN*3];
+pair<int,int> order[MAXN];
+int result[MAXN];
+
+void build(const int &t, const int &l, const int &r){
+    node[t].l=l; node[t].r=r;
+    node[t].cnt=r-l;
+    if(l==r-1) return ;
+    int mid=l+((r-l)>>1);
+    build(L(t),l,mid); //左闭右开区间
+    build(R(t),mid,r);
+}
+
+void update(const int &t, const int &pos, const int &val){
+    --node[t].cnt;
+    if(node[t].l == node[t].r-1){ //叶节点
+        result[ node[t].l ]=val; //左序号代表result的索引
+        return ;
+    }
+    if(node[L(t)].cnt > pos) //左区间的空位个数大于要去插队的位置，则插入左
+        update(L(t),pos,val);
+    else
+        update(R(t), pos-node[L(t)].cnt, val); //pos应减去左的空位数，以代表在右中要求的位置
+}
+int main()
+{
+    int n,i;
+    while(~scanf("%d",&n)){
+        memset(node,'\0',sizeof(node));
+        build(1,0,n);
+        for(i=0;i<n;i++)
+            scanf("%d%d",&order[i].first,&order[i].second);
+        //逆序插入
+        for(i=n-1;i>-1;i--)
+            update(1,order[i].first,order[i].second);
+        for(i=0;i<n;i++)
+            printf("%d%c",result[i],i==(n-1)?'\n':' ');
+    }
+    return 0;
+}
