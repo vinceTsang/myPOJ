@@ -1,0 +1,45 @@
+/**
+ * 本题的特殊之处是翻转位置(i,j)时，其余同行、同列的位置都需要被动翻转
+ * 那么考虑如何能够只翻转当前位置而不影响其余所有位置呢
+ * 由于4*4格子，边为偶数，那么对(i,j)以及其同行同列的7个位置全都主动翻转一次
+ * 那么(i,j)本身被翻了7次，同行同列翻了4次，其余格子翻了2次，此时达到“不影响其余位置”的目的
+ * 上述操作对于遇到一个'+'，需要对7个位置进行主动翻转
+ * 那么对所有遇到的'+'都这样操作，记录每个位置进行主动操作的次数，为奇数则表明需要进行最终的实际翻转
+ */
+#include <cstdio>
+using namespace std;
+
+int main()
+{
+    char cur;
+    int counts[4][4]={0},i,j;
+    for(i=0;i<4;i++){
+        for(j=0;j<4;j++){
+            scanf("%c",&cur);
+            if(cur=='+'){
+                for(int k=0;k<4;k++){
+                    counts[i][k]++;
+                    counts[k][j]++;
+                }
+                counts[i][j]--;
+            }
+        }
+        getchar(); // get '\n' , which is also a char.
+    }
+    int ans=0;
+    for(i=0;i<4;i++)
+        for(j=0;j<4;j++){
+            if(counts[i][j]%2==1){
+                ans++;
+            }
+        }
+    printf("%d\n",ans);
+    for(i=0;i<4;i++)
+        for(j=0;j<4;j++){
+            if(counts[i][j]%2==1){
+                ans++;
+                printf("%d %d\n",i+1,j+1);
+            }
+        }
+    return 0;
+}
