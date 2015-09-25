@@ -1,0 +1,34 @@
+/**
+ * 用math.h的pow直接过
+ * 本题手写快速幂练习
+ * 对于 n^p
+ * 指数p为偶数时，等价于(n^2)^(p/2)
+ * p位奇数时，等价于n * (n^2)^(p-1)/2
+ * 对求幂迭代至p小于等于1，其中奇数时n累乘至一个中间变量
+ */
+#include <cstdio>
+#include <iostream>
+using namespace std;
+
+double fastPow(double n,int p){
+    double tmp=1;
+    while(p>1){
+        if(p&1==1){ //奇数2进制最后一位为1
+            tmp *= n;
+        }
+        n *= n;
+        p >>= 1;
+    }
+    return n*tmp;
+}
+
+int main()
+{
+    double R;
+    int M,Y;
+    scanf("%lf %d %d",&R,&M,&Y);
+    double mpow=fastPow(R/100+1,Y);
+    int ans=M*mpow;
+    printf("%d\n",ans);
+    return 0;
+}
